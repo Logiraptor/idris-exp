@@ -31,28 +31,28 @@ repeat value n = repeat' value n [] where
 score : List Int -> Int
 score xs = score' xs 0 1 where
 
-    peek : List Int -> Int
-    peek [] = 0
-    peek (x :: xs) = x
+    next_frame : List Int -> Int
+    next_frame [] = 0
+    next_frame (x :: xs) = x
 
-    peek2 : List Int -> Int
-    peek2 [] = 0
-    peek2 (x :: []) = x
-    peek2 (x :: (y :: xs)) = x + y
+    next_two_frames : List Int -> Int
+    next_two_frames [] = 0
+    next_two_frames (x :: []) = x
+    next_two_frames (x :: (y :: xs)) = x + y
 
-    peek_and_sum : List Int -> Int -> Int
-    peek_and_sum xs x = x + (peek xs)
+    spare_bonus : List Int -> Int
+    spare_bonus xs = next_frame xs
 
-    peek_and_sum2 : List Int -> Int -> Int
-    peek_and_sum2 xs x = let bonus = peek2 xs in x + bonus
+    strike_bonus : List Int -> Int
+    strike_bonus xs = next_two_frames xs
 
     score_frame : List Int -> (Int, List Int)
     score_frame [] = (0, [])
     score_frame (x :: []) = (x, [])
     score_frame (10 :: xs) =
-        (peek_and_sum2 xs 10, xs)
+        ((strike_bonus xs) + 10, xs)
     score_frame (x :: (y :: xs)) = case x + y of
-        10 => (peek_and_sum xs 10, xs)
+        10 => ((spare_bonus xs) + 10, xs)
         _ => (x + y, xs)
 
     score': List Int -> Int -> Int -> Int
