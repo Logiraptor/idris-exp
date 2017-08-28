@@ -1,5 +1,11 @@
 module Main
 
+
+import Data.Fin
+
+Roll : Type
+Roll = Fin 11
+
 -- A - add initial clause
 -- S - split ident into case clause
 
@@ -21,48 +27,42 @@ assert_equal expected actual message =
         putStrLn ("expected: " ++ (show expected) ++ ", but got: " ++ (show actual) ++ " - " ++ message)
 
 
-repeat : Nat -> Nat -> List Nat
+repeat : a -> Nat -> List a
 repeat value n = repeat' value n [] where
-    repeat' : Nat -> Nat -> List Nat -> List Nat
+    repeat' : a -> Nat -> List a -> List a
     repeat' x Z xs = xs
     repeat' x (S n) xs = (repeat' x n (x::xs))
 
 
-isSpare : List Nat -> Bool
-isSpare [] = False
-isSpare (x :: []) = False
-isSpare (x :: (y :: xs)) = x + y == 10
 
-
-
-score : List Nat -> Nat
+score : List Roll -> Nat
 score xs = score' xs 0 1 where
 
-    next_frame : List Nat -> Nat
+    next_frame : List Roll -> Nat
     next_frame [] = 0
-    next_frame (x :: xs) = x
+    next_frame (x :: xs) = finToNat x
 
-    next_two_frames : List Nat -> Nat
+    next_two_frames : List Roll -> Nat
     next_two_frames [] = 0
-    next_two_frames (x :: []) = x
-    next_two_frames (x :: (y :: xs)) = x + y
+    next_two_frames (x :: []) = finToNat x
+    next_two_frames (x :: (y :: xs)) = (finToNat x) + (finToNat y)
 
-    spare_bonus : List Nat -> Nat
+    spare_bonus : List Roll -> Nat
     spare_bonus xs = next_frame xs
 
-    strike_bonus : List Nat -> Nat
+    strike_bonus : List Roll -> Nat
     strike_bonus xs = next_two_frames xs
 
-    score_frame : List Nat -> (Nat, List Nat)
+    score_frame : List Roll -> (Nat, List Roll)
     score_frame [] = (0, [])
-    score_frame (x :: []) = (x, [])
-    score_frame ((S (S (S (S (S (S (S (S (S (S Z)))))))))) :: xs) =
+    score_frame (x :: []) = (finToNat x, [])
+    score_frame ((FS (FS (FS (FS (FS (FS (FS (FS (FS (FS FZ)))))))))) :: xs) =
         ((strike_bonus xs) + 10, xs)
-    score_frame (x :: (y :: xs)) = case x + y of
+    score_frame (x :: (y :: xs)) = case (finToNat x) + (finToNat y) of
         (S (S (S (S (S (S (S (S (S (S Z)))))))))) => ((spare_bonus xs) + 10, xs)
-        _ => (x + y, xs)
+        sum => (sum, xs)
 
-    score': List Nat -> Nat -> Nat -> Nat
+    score': List Roll -> Nat -> Nat -> Nat
     score' [] x frame = x
     score' xs x (S (S (S (S (S (S (S (S (S (S (S Z))))))))))) = x
     score' xs x frame =
