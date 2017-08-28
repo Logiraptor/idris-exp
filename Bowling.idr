@@ -21,43 +21,50 @@ assert_equal expected actual message =
         putStrLn ("expected: " ++ (show expected) ++ ", but got: " ++ (show actual) ++ " - " ++ message)
 
 
-repeat : Int -> Int -> List Int
+repeat : Nat -> Nat -> List Nat
 repeat value n = repeat' value n [] where
-    repeat' : Int -> Int -> List Int -> List Int
-    repeat' x 0 xs = xs
-    repeat' x n xs = (repeat' x (n-1) (x::xs))
+    repeat' : Nat -> Nat -> List Nat -> List Nat
+    repeat' x Z xs = xs
+    repeat' x (S n) xs = (repeat' x n (x::xs))
 
 
-score : List Int -> Int
+isSpare : List Nat -> Bool
+isSpare [] = False
+isSpare (x :: []) = False
+isSpare (x :: (y :: xs)) = x + y == 10
+
+
+
+score : List Nat -> Nat
 score xs = score' xs 0 1 where
 
-    next_frame : List Int -> Int
+    next_frame : List Nat -> Nat
     next_frame [] = 0
     next_frame (x :: xs) = x
 
-    next_two_frames : List Int -> Int
+    next_two_frames : List Nat -> Nat
     next_two_frames [] = 0
     next_two_frames (x :: []) = x
     next_two_frames (x :: (y :: xs)) = x + y
 
-    spare_bonus : List Int -> Int
+    spare_bonus : List Nat -> Nat
     spare_bonus xs = next_frame xs
 
-    strike_bonus : List Int -> Int
+    strike_bonus : List Nat -> Nat
     strike_bonus xs = next_two_frames xs
 
-    score_frame : List Int -> (Int, List Int)
+    score_frame : List Nat -> (Nat, List Nat)
     score_frame [] = (0, [])
     score_frame (x :: []) = (x, [])
-    score_frame (10 :: xs) =
+    score_frame ((S (S (S (S (S (S (S (S (S (S Z)))))))))) :: xs) =
         ((strike_bonus xs) + 10, xs)
     score_frame (x :: (y :: xs)) = case x + y of
-        10 => ((spare_bonus xs) + 10, xs)
+        (S (S (S (S (S (S (S (S (S (S Z)))))))))) => ((spare_bonus xs) + 10, xs)
         _ => (x + y, xs)
 
-    score': List Int -> Int -> Int -> Int
+    score': List Nat -> Nat -> Nat -> Nat
     score' [] x frame = x
-    score' xs x 11 = x
+    score' xs x (S (S (S (S (S (S (S (S (S (S (S Z))))))))))) = x
     score' xs x frame =
         let (frame_score, rest) = score_frame xs in
             score' rest (frame_score + x) (frame + 1)
