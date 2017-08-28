@@ -33,6 +33,8 @@ repeat value n = repeat' value n [] where
     repeat' x Z xs = xs
     repeat' x (S n) xs = (repeat' x n (x::xs))
 
+roll_many : Roll -> Nat -> List Roll
+roll_many = repeat {a=Roll}
 
 
 score : List Roll -> Nat
@@ -71,9 +73,9 @@ score xs = score' xs 0 1 where
 
 
 main : IO ()
-main = do assert_equal 0   (score (repeat 0 20))               "Gutter game scores 0"
-          assert_equal 20  (score (repeat 1 20))               "All ones scores 20"
-          assert_equal 16  (score ([5,5,3] ++ (repeat 0 17)))  "One spare"
-          assert_equal 24  (score ([10,3,4] ++ (repeat 0 16))) "One strike"
-          assert_equal 300 (score (repeat 10 12))              "Perfect Game"
+main = do assert_equal 0   (score (roll_many 0 20))               "Gutter game scores 0"
+          assert_equal 20  (score (roll_many 1 20))               "All ones scores 20"
+          assert_equal 16  (score ([5,5,3] ++ (roll_many 0 17)))  "One spare"
+          assert_equal 24  (score ([10,3,4] ++ (roll_many 0 16))) "One strike"
+          assert_equal 300 (score (roll_many 10 12))              "Perfect Game"
 
