@@ -19,6 +19,9 @@ mutual
     score (S n) (x :: y :: xs) = if x + y == 10 then score_spare n xs else x + y + score n xs
     score (S n) (x :: xs) = x + score n xs
 
+    score_game : Vect n Nat -> Nat
+    score_game = score 10
+
 
 gutterGame : score 10 (replicate 20 0) = 0
 gutterGame = Refl
@@ -36,13 +39,20 @@ perfectGame : score 10 (replicate 12 10) = 300
 perfectGame = Refl
 
 
--- gutterGamesWithNRolls : (n : Nat) -> score 10 (replicate n 0) = 0
--- gutterGamesWithNRolls Z = Refl
--- gutterGamesWithNRolls (S k) = inductiveStep {n=k} {f=10} (gutterGamesWithNRolls k) where
---     inductiveStep : {n : Nat} -> {f: Nat} -> score f (replicate n 0) = 0 -> score f (replicate (S n) 0) = 0
---     inductiveStep {n = Z} prf = ?inductiveStep_rhs_3
---     inductiveStep {n = (S j)} prf = ?inductiveStep_rhs_2
+gutterGamesWithNRolls : {n : Nat} -> score_game (replicate n 0) = 0
+gutterGamesWithNRolls {n = Z} = Refl
+gutterGamesWithNRolls {n = (S k)} = inductiveStep gutterGamesWithNRolls where
+    inductiveStep : {n : Nat} -> score_game (replicate n 0) = 0 -> score_game (0 :: replicate n 0) = 0
+    inductiveStep {n = Z} prf = Refl
+    inductiveStep {n = (S j)} prf = inductiveStep prf
 
+
+onePinGamesWithNFrames : {n : Nat} -> score n (replicate (mult n 2) 1) = (mult n 2)
+onePinGamesWithNFrames {n = Z} = Refl
+onePinGamesWithNFrames {n = (S k)} =
+    let left = (score k (replicate (mult k 2) 1)) in
+    let right = mult k 2 in
+        eqSucc (S left) (S right) (eqSucc left right onePinGamesWithNFrames)
 
 
 main : IO ()
